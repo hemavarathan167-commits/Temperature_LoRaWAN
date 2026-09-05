@@ -80,9 +80,73 @@ Update rate: 1 Hz (one reading per second)</br>
 
 # PROGRAM:
 
+```
+#include "ThingSpeak.h"
+#include <WiFi.h>
+#include "DHT.h"
+
+char ssid[] = "varathan gvs";
+char pass[] = "1234567890";
+WiFiClient client ;
+
+const int out = 2;
+float temperature = 0;
+float humidity = 0;
+DHT dht(out, DHT11);
+
+unsigned long myChannelField = 3460330;
+const int temperatureField = 1;
+const int humidityField = 2;
+const char* myWriteAPIKey = "JQDEUTIJQYW4DTRJ";
+
+void setup() 
+{
+  Serial.begin(115200);
+  ThingSpeak.begin(client);
+  dht.begin();
+  pinMode(out, INPUT);
+}
+
+void loop() 
+{
+  if(WiFi.status() != WL_CONNECTED)
+  {
+    Serial.print("Attempting to connect to SSID: ");
+    Serial.println(ssid);
+
+    while(WiFi.status() != WL_CONNECTED)
+    {
+      WiFi.begin(ssid, pass);
+      Serial.print(".");
+      delay(5000);
+    }
+    Serial.println("\nConnected");
+  }
+
+  float temperature = dht.readTemperature();
+  float humidity = dht.readHumidity();
+
+  Serial.print("Temperature: ");
+  Serial.print(temperature);
+  Serial.println(" °C");
+
+  Serial.print("Humidity: ");
+  Serial.print(humidity);
+  Serial.println(" g.m-3");
+
+  ThingSpeak.setField(temperatureField, temperature);
+  ThingSpeak.setField(humidityField, humidity);
+  ThingSpeak.writeFields(myChannelField, myWriteAPIKey);
+  delay(5000);
+}
+```
+
 # CIRCUIT DIAGRAM:
+<img width="963" height="1280" alt="image" src="https://github.com/user-attachments/assets/e31fcc79-2526-41ac-9cd0-c84e5285d6c7" />
 
 # OUTPUT:
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/0aa93120-eefc-4841-874c-e065bd3f091e" />
+<img width="1917" height="1078" alt="image" src="https://github.com/user-attachments/assets/23c94ecb-848c-4c13-abf2-80e5f4a0cdde" />
 
 # RESULT:
 
